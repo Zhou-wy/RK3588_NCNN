@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 
+# SDK 链接库
+add_subdirectory(${CMAKE_SOURCE_DIR}/SDK/common)
+
 # 设置输出bin文件路径
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
@@ -28,7 +31,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv7-a -mfloat-abi=hard -mfpu=ne
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "c flags")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" CACHE STRING "c++ flags")
 
-include(${CMAKE_SOURCE_DIR}/cmake/3dparty.cmake)
 
+include(${CMAKE_SOURCE_DIR}/cmake/3dparty.cmake)
 add_executable(${PROJECT_NAME} main.cpp)
-target_link_libraries(${PROJECT_NAME}  ncnn ${OpenCV_LIBS} ${FFMEPG_LIB})
+target_link_libraries(${PROJECT_NAME}  ncnn ${OpenCV_LIBS} ${FFMEPG_LIB} common)

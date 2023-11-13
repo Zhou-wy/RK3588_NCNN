@@ -10,9 +10,9 @@ elseif(UNIX)
     set(NCNN_DIR "${PROJECT_SOURCE_DIR}/3dparty/arm_ncnn")
     set(CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/3dparty/arm_opencv/lib/cmake/opencv4")
     set(FFMEPG "${PROJECT_SOURCE_DIR}/3dparty/rk_opencv_depend")
+    set(FFMEPG_LIB ${FFMEPG_LIB} x264 z xvidcore)
 
 else()
-
     message(FATAL_ERROR "Unsupported platform: ${CMAKE_SYSTEM_NAME}")
 endif()
 
@@ -29,7 +29,7 @@ message(STATUS "OpenCV includedir:${OpenCV_INCLUDE_DIRS}")
 
 include_directories(${FFMEPG}/include)
 link_directories(${FFMEPG}/lib)
-set(FFMEPG_LIB ${FFMEPG_LIB} avcodec  avdevice  avfilter  avformat  avutil avresample postproc  swresample  swscale x264 xvidcore z)
+set(FFMEPG_LIB ${FFMEPG_LIB} avcodec  avdevice  avfilter  avformat  avutil avresample postproc  swresample  swscale )
 message(STATUS "FFMEPG libdir:${FFMEPG}/lib")
 message(STATUS "FFMEPG includedir:${FFMEPG}/include")
 

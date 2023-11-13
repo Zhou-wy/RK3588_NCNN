@@ -17,7 +17,9 @@ namespace NCN {
         Int32 = 2,
         UInt8 = 3
     };
+
     using float16 = unsigned short;
+    int data_type_size(DataType dt);
 
     class MgtMem {
     public:
@@ -84,7 +86,8 @@ namespace NCN {
         inline int bytes() const { return this->m_bytes; }
 
         inline int bytes(int start_axis) const { return count(start_axis) * element_size(); }
-//        inline int element_size() const { return data_type_size(this->m_type); }
+
+        inline int element_size() const { return data_type_size(this->m_type); }
 
         std::shared_ptr<Tensor> clone() const;
 
@@ -122,10 +125,7 @@ namespace NCN {
 
         Tensor &to_float();
 
-        Tensor &to_cpu(bool copy = true);
-
         inline void *cpu() const {
-            ((Tensor *) this)->to_cpu();
             return m_data->cpu();
         }
 
@@ -150,10 +150,7 @@ namespace NCN {
 
         const char *descriptor() const;
 
-        void reference_data(const std::vector<int> &shape,
-                            void *cpu_data, size_t cpu_size,
-                            void *gpu_data, size_t gpu_size,
-                            DataType d_type);
+        void reference_data(const std::vector<int> &shape, void *cpu_data, size_t cpu_size, DataType d_type);
 
     private:
         Tensor &compute_shape_string();

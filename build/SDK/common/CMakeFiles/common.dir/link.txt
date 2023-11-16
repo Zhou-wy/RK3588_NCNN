@@ -1,0 +1,2 @@
+/usr/bin/ar qc /Users/zwy/CppProject/RK3588_NCNN/apple_bin/libcommon.a CMakeFiles/common.dir/Tensor.cpp.o
+/usr/bin/ranlib /Users/zwy/CppProject/RK3588_NCNN/apple_bin/libcommon.a

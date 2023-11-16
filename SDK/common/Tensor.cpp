@@ -5,8 +5,10 @@
 #include "Tensor.hpp"
 #include <cstdint>
 #include <cstring>
+#include <memory>
 
 namespace NCN {
+
     MgtMem::MgtMem(void *cpu, size_t cpu_size) { reference_data(cpu, cpu_size); }
 
     MgtMem::~MgtMem() { release_cpu(); }
@@ -32,7 +34,7 @@ namespace NCN {
     void MgtMem::reference_data(void *cpu, size_t cpu_size) {
         release_cpu();
 
-        if (m_cpu == nullptr || m_cpu_size == 0) {
+        if (cpu == nullptr || cpu_size == 0) {
             cpu = nullptr;
             cpu_size = 0;
         }
@@ -224,7 +226,8 @@ namespace NCN {
             }
             m_strides[i] = prev_size * prev_shape;
         }
-
+        this->adajust_memory_by_update_dims_or_type();
+        this->compute_shape_string();
         return *this;
     }
 
@@ -341,6 +344,10 @@ namespace NCN {
     }
 
     void Tensor::setup_data(std::shared_ptr<MgtMem> data) {
-
+        if (data != nullptr) {
+            m_data = data;
+        } else {
+            m_data = std::make_shared<MgtMem>();
+        }
     }
 }; // namespace NCN

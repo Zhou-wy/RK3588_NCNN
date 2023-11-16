@@ -5,6 +5,11 @@ if(APPLE)
     set(COMPILER "/Library/Developer/CommandLineTools/")
     set(CMAKE_C_COMPILER "${COMPILER}/usr/bin/gcc")
     set(CMAKE_CXX_COMPILER "${COMPILER}/usr/bin/g++")
+    # 设置输出bin文件路径
+    set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/apple_bin)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/apple_bin)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-deprecated-declarations")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
 
 elseif(UNIX)
     # Linux-specific settings
@@ -23,6 +28,10 @@ elseif(UNIX)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "c flags")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" CACHE STRING "c++ flags")
 
+    link_directories(/usr/local/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/arm-linux-gnueabihf/libc/lib)
+    # 设置输出bin文件路径
+    set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/rk3588_bin)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/rk3588_bin)
 else()
     message(FATAL_ERROR "Unsupported platform: ${CMAKE_SYSTEM_NAME}")
 endif()

@@ -19,10 +19,15 @@ namespace NCN {
     };
 
     using float16 = unsigned short;
+
     int data_type_size(DataType dt);
+
+    const char *data_type_string(DataType dt);
 
     class MgtMem {
     public:
+        MgtMem() = default;
+
         MgtMem(void *cpu, size_t cpu_size);
 
         virtual ~MgtMem();
@@ -126,6 +131,7 @@ namespace NCN {
         Tensor &to_float();
 
         inline void *cpu() const {
+            m_data->cpu(m_bytes);
             return m_data->cpu();
         }
 

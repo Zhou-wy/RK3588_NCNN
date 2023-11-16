@@ -1,5 +1,6 @@
 .idea
 cmake_debug_rk3588_build
 cmake_debug_darwin_build
+build
 apple_bin
 rk3588_bin

@@ -35,7 +35,7 @@
 
 #include <sys/time.h>
 #include <sys/stat.h>
-
+#include <dirent.h>
 
 #define __GetTimeBlock \
     timeval currentTime;                    \
@@ -317,7 +317,7 @@ namespace NCN {
         stat(file.c_str(), &st);
         return st.st_mtim.tv_sec;
 #elif defined(U_OS_WINDOWS)
-        INFOW("LastModify has not support on windows os");
+        zInfo("LastModify has not support on windows os");
         return 0;
 #elif defined(U_OS_MACOS)
         struct stat st;
@@ -634,55 +634,110 @@ namespace NCN {
                 return true;
         }
         return false;
+    }
 
 
 #ifdef U_OS_WINDOWS
-        vector<string> find_files(const string& directory, const string& filter, bool findDirectory, bool includeSubDirectory){
+    std::vector<std::string> find_files(const std::string& directory, const std::string& filter, bool findDirectory, bool includeSubDirectory){
 
-        string realpath = directory;
-        if (realpath.empty())
-            realpath = "./";
+    std::string realpath = directory;
+    if (realpath.empty())
+        realpath = "./";
 
-        char backchar = realpath.back();
-        if (backchar not_eq '\\' and backchar not_eq '/')
-            realpath += "/";
+    char backchar = realpath.back();
+    if (backchar not_eq '\\' and backchar not_eq '/')
+        realpath += "/";
 
-        vector<string> out;
-        _WIN32_FIND_DATAA find_data;
-        stack<string> ps;
-        ps.push(realpath);
+    std::vector<string> out;
+    _WIN32_FIND_DATAA find_data;
+    std::stack<string> ps;
+    ps.push(realpath);
 
-        while (!ps.empty())
-        {
-            string search_path = ps.top();
-            ps.pop();
+    while (!ps.empty())
+    {
+        std::string search_path = ps.top();
+        ps.pop();
 
-            HANDLE hFind = FindFirstFileA((search_path + "*").c_str(), &find_data);
-            if (hFind not_eq INVALID_HANDLE_VALUE){
-                do{
-                    if (strcmp(find_data.cFileName, ".") == 0 or strcmp(find_data.cFileName, "..") == 0)
-                        continue;
+        HANDLE hFind = FindFirstFileA((search_path + "*").c_str(), &find_data);
+        if (hFind not_eq INVALID_HANDLE_VALUE){
+            do{
+                if (strcmp(find_data.cFileName, ".") == 0 or strcmp(find_data.cFileName, "..") == 0)
+                    continue;
 
-                    if (!findDirectory and (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) not_eq FILE_ATTRIBUTE_DIRECTORY or
-                        findDirectory and (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY){
-                        if (PathMatchSpecA(find_data.cFileName, filter.c_str()))
-                            out.push_back(search_path + find_data.cFileName);
-                    }
+                if (!findDirectory and (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) not_eq FILE_ATTRIBUTE_DIRECTORY or
+                    findDirectory and (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY){
+                    if (PathMatchSpecA(find_data.cFileName, filter.c_str()))
+                        out.push_back(search_path + find_data.cFileName);
+                }
 
-                    if (includeSubDirectory and (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
-                        ps.push(search_path + find_data.cFileName + "/");
+                if (includeSubDirectory and (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+                    ps.push(search_path + find_data.cFileName + "/");
 
-                } while (FindNextFileA(hFind, &find_data));
-                FindClose(hFind);
-            }
+            } while (FindNextFileA(hFind, &find_data));
+            FindClose(hFind);
         }
-        return out;
     }
+    return out;
+}
 #endif
 
 #ifdef U_OS_LINUX
-        std::vector<string> find_files(const std::string& directory, const std::string& filter, bool findDirectory, bool includeSubDirectory)
+    std::vector<string> find_files(const std::string& directory, const std::string& filter, bool findDirectory, bool includeSubDirectory)
+{
+    std::string realpath = directory;
+    if (realpath.empty())
+        realpath = "./";
+
+    char backchar = realpath.back();
+    if (backchar not_eq '\\' and backchar not_eq '/')
+        realpath += "/";
+
+    struct dirent* fileinfo;
+    DIR* handle;
+    std::stack<string> ps;
+    std::vector<string> out;
+    ps.push(realpath);
+
+    while (!ps.empty())
     {
+        std::string search_path = ps.top();
+        ps.pop();
+
+        handle = opendir(search_path.c_str());
+        if (handle not_eq 0)
+        {
+            while (fileinfo = readdir(handle))
+            {
+                struct stat file_stat;
+                if (strcmp(fileinfo->d_name, ".") == 0 or strcmp(fileinfo->d_name, "..") == 0)
+                    continue;
+
+                if (lstat((search_path + fileinfo->d_name).c_str(), &file_stat) < 0)
+                    continue;
+
+                if (!findDirectory and !S_ISDIR(file_stat.st_mode) or
+                    findDirectory and S_ISDIR(file_stat.st_mode))
+                {
+                    if (pattern_match(fileinfo->d_name, filter.c_str()))
+                        out.push_back(search_path + fileinfo->d_name);
+                }
+
+                if (includeSubDirectory and S_ISDIR(file_stat.st_mode))
+                    ps.push(search_path + fileinfo->d_name + "/");
+            }
+            closedir(handle);
+        }
+    }
+    return out;
+}
+#endif
+
+#ifdef U_OS_MACOS
+
+    std::vector<string> find_files(const std::string &directory,
+                                   const std::string &filter,
+                                   bool findDirectory,
+                                   bool includeSubDirectory) {
         std::string realpath = directory;
         if (realpath.empty())
             realpath = "./";
@@ -691,22 +746,19 @@ namespace NCN {
         if (backchar not_eq '\\' and backchar not_eq '/')
             realpath += "/";
 
-        struct dirent* fileinfo;
-        DIR* handle;
-        stack<string> ps;
-        vector<string> out;
+        struct dirent *fileinfo;
+        DIR *handle;
+        std::stack<string> ps;
+        std::vector<string> out;
         ps.push(realpath);
 
-        while (!ps.empty())
-        {
-            string search_path = ps.top();
+        while (!ps.empty()) {
+            std::string search_path = ps.top();
             ps.pop();
 
             handle = opendir(search_path.c_str());
-            if (handle not_eq 0)
-            {
-                while (fileinfo = readdir(handle))
-                {
+            if (handle not_eq 0) {
+                while (fileinfo = readdir(handle)) {
                     struct stat file_stat;
                     if (strcmp(fileinfo->d_name, ".") == 0 or strcmp(fileinfo->d_name, "..") == 0)
                         continue;
@@ -715,8 +767,7 @@ namespace NCN {
                         continue;
 
                     if (!findDirectory and !S_ISDIR(file_stat.st_mode) or
-                        findDirectory and S_ISDIR(file_stat.st_mode))
-                    {
+                                           findDirectory and S_ISDIR(file_stat.st_mode)) {
                         if (pattern_match(fileinfo->d_name, filter.c_str()))
                             out.push_back(search_path + fileinfo->d_name);
                     }
@@ -729,116 +780,13 @@ namespace NCN {
         }
         return out;
     }
+
 #endif
 
-//        std::string align_blank(const std::string &input, int align_size, char blank) {
-//            if (input.size() >= align_size) return input;
-//            string output = input;
-//            for (int i = 0; i < align_size - input.size(); ++i)
-//                output.push_back(blank);
-//            return output;
-//        }
-
-
-#ifdef U_OS_WINDOWS
-        std::vector<std::string> find_files(const std::string& directory, const std::string& filter, bool findDirectory, bool includeSubDirectory){
-
-        std::string realpath = directory;
-        if (realpath.empty())
-            realpath = "./";
-
-        char backchar = realpath.back();
-        if (backchar not_eq '\\' and backchar not_eq '/')
-            realpath += "/";
-
-        std::vector<string> out;
-        _WIN32_FIND_DATAA find_data;
-        std::stack<string> ps;
-        ps.push(realpath);
-
-        while (!ps.empty())
-        {
-            std::string search_path = ps.top();
-            ps.pop();
-
-            HANDLE hFind = FindFirstFileA((search_path + "*").c_str(), &find_data);
-            if (hFind not_eq INVALID_HANDLE_VALUE){
-                do{
-                    if (strcmp(find_data.cFileName, ".") == 0 or strcmp(find_data.cFileName, "..") == 0)
-                        continue;
-
-                    if (!findDirectory and (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) not_eq FILE_ATTRIBUTE_DIRECTORY or
-                        findDirectory and (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY){
-                        if (PathMatchSpecA(find_data.cFileName, filter.c_str()))
-                            out.push_back(search_path + find_data.cFileName);
-                    }
-
-                    if (includeSubDirectory and (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
-                        ps.push(search_path + find_data.cFileName + "/");
-
-                } while (FindNextFileA(hFind, &find_data));
-                FindClose(hFind);
-            }
-        }
-        return out;
-    }
-#endif
-
-#ifdef U_OS_LINUX
-        std::vector<string> find_files(const std::string& directory, const std::string& filter, bool findDirectory, bool includeSubDirectory)
-    {
-        std::string realpath = directory;
-        if (realpath.empty())
-            realpath = "./";
-
-        char backchar = realpath.back();
-        if (backchar not_eq '\\' and backchar not_eq '/')
-            realpath += "/";
-
-        struct dirent* fileinfo;
-        DIR* handle;
-        std::stack<string> ps;
-        std::vector<string> out;
-        ps.push(realpath);
-
-        while (!ps.empty())
-        {
-            std::string search_path = ps.top();
-            ps.pop();
-
-            handle = opendir(search_path.c_str());
-            if (handle not_eq 0)
-            {
-                while (fileinfo = readdir(handle))
-                {
-                    struct stat file_stat;
-                    if (strcmp(fileinfo->d_name, ".") == 0 or strcmp(fileinfo->d_name, "..") == 0)
-                        continue;
-
-                    if (lstat((search_path + fileinfo->d_name).c_str(), &file_stat) < 0)
-                        continue;
-
-                    if (!findDirectory and !S_ISDIR(file_stat.st_mode) or
-                        findDirectory and S_ISDIR(file_stat.st_mode))
-                    {
-                        if (pattern_match(fileinfo->d_name, filter.c_str()))
-                            out.push_back(search_path + fileinfo->d_name);
-                    }
-
-                    if (includeSubDirectory and S_ISDIR(file_stat.st_mode))
-                        ps.push(search_path + fileinfo->d_name + "/");
-                }
-                closedir(handle);
-            }
-        }
-        return out;
-    }
-#endif
-    }
 
     std::string align_blank(const std::string &input, int align_size, char blank) {
         if (input.size() >= align_size) return input;
-        string output = input;
+        std::string output = input;
         for (int i = 0; i < align_size - input.size(); ++i)
             output.push_back(blank);
         return output;
@@ -889,7 +837,7 @@ namespace NCN {
         g_signum = signum;
     }
 
-    // 捕获：SIGINT(2)、SIGQUIT(3)
+// 捕获：SIGINT(2)、SIGQUIT(3)
     int while_loop() {
         signal(SIGINT, signal_callback_handler);
         //signal(SIGQUIT, signal_callback_handler);
@@ -900,7 +848,7 @@ namespace NCN {
         return g_signum;
     }
 
-    // 关于logger的api
+// 关于logger的api
     const char *level_string(LogLevel level) {
         switch (level) {
             case LogLevel::Debug:
@@ -1072,7 +1020,7 @@ namespace NCN {
         else {
             n += snprintf(buffer + n, sizeof(buffer) - n, "[%s]", level_string(level));
         }
-#elif defined(U_OS_LINUX)
+#elif defined(U_OS_LINUX) || defined(U_OS_MACOS)
         if (level == LogLevel::Fatal or level == LogLevel::Error) {
             n += snprintf(buffer + n, sizeof(buffer) - n, "[\033[31m%s\033[0m]", level_string(level));
         }

@@ -1,7 +1,0 @@
-/Users/zwy/CppProject/RK3588_NCNN/build/CMakeFiles/RK3588_NCNN.dir
-/Users/zwy/CppProject/RK3588_NCNN/build/CMakeFiles/test_tensor.dir
-/Users/zwy/CppProject/RK3588_NCNN/build/CMakeFiles/edit_cache.dir
-/Users/zwy/CppProject/RK3588_NCNN/build/CMakeFiles/rebuild_cache.dir
-/Users/zwy/CppProject/RK3588_NCNN/build/SDK/common/CMakeFiles/common.dir
-/Users/zwy/CppProject/RK3588_NCNN/build/SDK/common/CMakeFiles/edit_cache.dir
-/Users/zwy/CppProject/RK3588_NCNN/build/SDK/common/CMakeFiles/rebuild_cache.dir

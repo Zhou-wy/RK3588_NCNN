@@ -27,25 +27,25 @@ int main()
 
     // Test isfile function
     bool is_file = isfile(test_file);
-    std::cout << "Is file '" << test_file << "' present? " << std::boolalpha << is_file << std::endl;
+    zDebug("Is file %s present? : %s", test_file.c_str(), is_file ? "true" : "false");
 
     // Test mkdir function
     bool mkdir_result = mkdir(test_directory);
-    std::cout << "Create directory '" << test_directory << "' result: " << std::boolalpha << mkdir_result << std::endl;
+    zVerbose("Create directory %s result: %s", test_directory.c_str(), mkdir_result ? "succeed" : "fialed");
 
     // Test delete_file function
     bool delete_file_result = delete_file(test_file);
-    std::cout << "Delete file '" << test_file << "' result: " << std::boolalpha << delete_file_result << std::endl;
+    zError("Delete file %s result: %s", test_file.c_str(), delete_file_result ? "succeed" : "fialed");
 
     // Test rmtree function
     bool rmtree_result = rmtree(test_directory);
-    std::cout << "Remove directory '" << test_directory << "' result: " << std::boolalpha << rmtree_result << std::endl;
+    zFatal("Remove directory %s result: %s", test_directory.c_str(), delete_file_result ? "succeed" : "fialed");
 
     // Test other functions
 
     // Test format function
     std::string formatted_str = format("Test %d %s", 42, "format");
-    std::cout << "Formatted String: " << formatted_str << std::endl;
+    zWarning("Formatted String: %s", formatted_str.c_str());
 
     // Test fopen_mkdirs function
     FILE *file = fopen_mkdirs("apple_bin/test_dir/test_file.txt", "w");

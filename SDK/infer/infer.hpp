@@ -15,8 +15,6 @@ public:
     virtual void pre_process();
     virtual void post_process();
 
-
-
     virtual ~infer();
 };
 

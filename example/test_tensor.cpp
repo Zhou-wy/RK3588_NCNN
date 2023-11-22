@@ -2,8 +2,8 @@
 // Created by zhouwy on 2023/11/13.
 //
 
-#include <iostream>
 #include "../SDK/common/Tensor.hpp"
+#include <iostream>
 
 union FloatConverter {
     float float32;
@@ -30,9 +30,11 @@ int main(int argc, char *argv[]) {
     std::cout << "tensor.size_3 = " << tensor.size(3) << std::endl;
     std::cout << "data type = " << data_type_string(tensor.type()) << std::endl;
     tensor.at<float>(0, 0) = 24.0;
-    std::cout << "tensor.at<float>(0, 0) = " << tensor.at<float>(0, 0) << std::endl;
+    std::cout << "tensor.at<float>(0, 0) = " << tensor.at<float>(0, 0)
+              << std::endl;
     std::cout << tensor.element_size() << "==" << sizeof(float) << std::endl;
-    std::cout << tensor.bytes() << "==" << 2 * 3 * 4 * 5 * sizeof(float) << std::endl;
+    std::cout << tensor.bytes() << "==" << 2 * 3 * 4 * 5 * sizeof(float)
+              << std::endl;
     if (isFloat16(tensor.at<float>(0, 0, 0, 0))) {
         std::cout << "The float value is float16." << std::endl;
     } else {
@@ -45,10 +47,12 @@ int main(int argc, char *argv[]) {
     std::cout << "resized tensor.channel = " << tensor.channel() << std::endl;
     std::cout << "resized tensor.height = " << tensor.height() << std::endl;
     std::cout << "resized tensor.width = " << tensor.width() << std::endl;
-    std::cout << "resized tensor.at<float>(0, 0) = " << typeid(tensor.at<float>(0, 0, 0, 0)).name() << std::endl;
+    std::cout << "resized tensor.at<float>(0, 0) = "
+              << typeid(tensor.at<float>(0, 0, 0, 0)).name() << std::endl;
 
     tensor.to_half();
-    std::cout << "resized tensor type = " << data_type_string(tensor.type()) << std::endl;
+    std::cout << "resized tensor type = " << data_type_string(tensor.type())
+              << std::endl;
     if (isFloat16(tensor.at<float>(0, 0, 0, 0))) {
         std::cout << "The float value is float16." << std::endl;
     } else {
@@ -56,5 +60,3 @@ int main(int argc, char *argv[]) {
     }
     return 0;
 }
-
-

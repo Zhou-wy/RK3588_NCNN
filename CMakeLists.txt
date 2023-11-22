@@ -17,8 +17,8 @@ add_executable(${PROJECT_NAME} main.cpp)
 target_link_libraries(${PROJECT_NAME}  ncnn ${OpenCV_LIBS} ${FFMEPG_LIB} ${SDK_LIB})
 
 ## 测试用例
-add_executable(test_tensor ${CMAKE_SOURCE_DIR}/example/test_tensor.cpp)
-target_link_libraries(test_tensor ncnn ${OpenCV_LIBS} ${FFMEPG_LIB} ${SDK_LIB})
+# add_executable(test_tensor ${CMAKE_SOURCE_DIR}/example/test_tensor.cpp)
+# target_link_libraries(test_tensor ncnn ${OpenCV_LIBS} ${FFMEPG_LIB} ${SDK_LIB})
 
 add_executable(test_logger ${CMAKE_SOURCE_DIR}/example/test_logger.cpp)
 target_link_libraries(test_logger ncnn ${OpenCV_LIBS} ${FFMEPG_LIB} ${SDK_LIB})

@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <cstring>
 #include <memory>
+#include "zLogger.hpp"
 
 namespace NCN {
 
@@ -53,7 +54,7 @@ namespace NCN {
             case DataType::UInt8:
                 return sizeof(uint8_t);
             default: {
-//                INFOE("Not support dtype: %d", dt);
+               zError("Not support dtype: %d", dt);
                 return -1;
             }
         }
@@ -180,7 +181,7 @@ namespace NCN {
         } else if (m_type == DataType::UInt8) {
             memset_any_type(cpu<uint8_t>(), c, (uint8_t) value);
         } else {
-            //            INFOE("Unsupport type: %d", m_type);
+                zError("Unsupport type: %d", m_type);
         }
         return *this;
     }
@@ -258,7 +259,7 @@ namespace NCN {
             return *this;
 
         if (type() != DataType::Float) {
-//            INFOF("not implement function");
+           zInfo("not implement function");
             return *this;
         }
 
@@ -282,7 +283,7 @@ namespace NCN {
             return *this;
 
         if (type() != DataType::Float16) {
-//            INFOF("not implement function");
+           zInfo("not implement function");
             return *this;
         }
 

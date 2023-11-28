@@ -38,8 +38,8 @@ int main()
     zError("Delete file %s result: %s", test_file.c_str(), delete_file_result ? "succeed" : "fialed");
 
     // Test rmtree function
-    bool rmtree_result = rmtree(test_directory);
-    zFatal("Remove directory %s result: %s", test_directory.c_str(), delete_file_result ? "succeed" : "fialed");
+    // bool rmtree_result = rmtree(test_directory);
+    // zFatal("Remove directory %s result: %s", test_directory.c_str(), delete_file_result ? "succeed" : "fialed");
 
     // Test other functions
 

@@ -1,3 +1,4 @@
+.cache
 .idea
 cmake_debug_rk3588_build
 cmake_debug_darwin_build
